@@ -5,7 +5,7 @@ mim install mmengine
 mim install 'mmcv>=2.0.0rc1'
 pip install 'mmdet>=3.0.0rc0'
 
-git clone https://github.com/open-mmlab/mmocr.git /mmocr
+git clone https://github.com/SmallGreenTurtle0-0/mmocr.git
 cd mmocr
 pip install -r requirements.txt
 pip install --no-cache-dir -e .
