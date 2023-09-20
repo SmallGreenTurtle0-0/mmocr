@@ -1,7 +1,8 @@
 auto_scale_lr = dict(base_batch_size=32)
 
 default_hooks = dict(
-    checkpoint=dict(interval=1, type='CheckpointHook'),
+    checkpoint=dict(type='CheckpointHook', save_best='auto'),
+    # checkpoint=dict(interval=1, type='CheckpointHook'),
     logger=dict(interval=100, type='LoggerHook'),
     param_scheduler=dict(type='ParamSchedulerHook'),
     sampler_seed=dict(type='DistSamplerSeedHook'),
