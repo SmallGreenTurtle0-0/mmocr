@@ -39,7 +39,7 @@ def parse_legacy_data(in_path: str,
             labels.append(label)
         return file_paths, labels
     else:
-        with open(in_path) as f:
+        with open(in_path, encoding="utf-8") as f:
             if format == 'txt':
                 for line in f:
                     line = strip_cls(line)

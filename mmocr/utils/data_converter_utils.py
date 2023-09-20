@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import warnings
+import json
 from typing import Dict, Sequence
 
 import mmengine
@@ -121,8 +122,9 @@ def dump_ocr_data(image_infos: Sequence[Dict], out_json_name: str,
             single_info['instances'].append(instance)
 
         out_json['data_list'].append(single_info)
-
-    mmengine.dump(out_json, out_json_name, **kwargs)
+    with open( out_json_name, 'w', encoding='utf-8') as file:
+        json.dump(out_json, file, ensure_ascii=False)
+    # mmengine.dump(out_json, out_json_name, **kwargs)
 
     return out_json
 
@@ -187,3 +189,4 @@ def recog_anno_to_imginfo(
         results.append(result)
 
     return results
+
