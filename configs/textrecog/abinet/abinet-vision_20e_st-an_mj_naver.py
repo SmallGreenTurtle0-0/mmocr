@@ -37,7 +37,7 @@ test_dataset = dict(
     type='ConcatDataset', datasets=test_list, pipeline=_base_.test_pipeline)
 
 train_dataloader = dict(
-    batch_size=128,
+    batch_size=64,
     num_workers=32,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
