@@ -1,4 +1,4 @@
-auto_scale_lr = dict(base_batch_size=32)
+auto_scale_lr = dict(base_batch_size=40)
 
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', save_best='auto'),
@@ -67,9 +67,9 @@ model = dict(
             type='Dictionary',
             with_end=True,
             with_padding=False,
-            with_start=True,
+            with_start=False,
             with_unknown=False),
-        max_seq_len=26,
+        max_seq_len=26.///////////,
         module_loss=dict(letter_case='lower', type='ABIModuleLoss'),
         postprocessor=dict(type='AttentionPostprocessor'),
         type='ABIFuser',
@@ -104,7 +104,7 @@ naver_textrecog_train = dict(
     test_mode=False,
     type='OCRDataset')
 optim_wrapper = dict(
-    optimizer=dict(lr=0.0001, type='Adam'), type='OptimWrapper')
+    optimizer=dict(lr=0.00001, type='Adam'), type='OptimWrapper')
 param_scheduler = [
     dict(
         convert_to_iter_based=True, end=2, start_factor=0.001,
@@ -215,9 +215,9 @@ test_pipeline = [
         ),
         type='PackTextRecogInputs'),
 ]
-train_cfg = dict(max_epochs=20, type='EpochBasedTrainLoop', val_interval=1)
+train_cfg = dict(max_epochs=60, type='EpochBasedTrainLoop', val_interval=1)
 train_dataloader = dict(
-    batch_size=64,
+    batch_size=80,
     dataset=dict(
         datasets=[
             dict(
@@ -327,28 +327,28 @@ train_dataset = dict(
             transforms=[
                 dict(
                     transforms=[
-                        dict(max_angle=15, type='RandomRotate'),
-                        dict(
-                            degrees=15,
-                            op='RandomAffine',
-                            scale=(
-                                0.5,
-                                2.0,
-                            ),
-                            shear=(
-                                -45,
-                                45,
-                            ),
-                            translate=(
-                                0.3,
-                                0.3,
-                            ),
-                            type='TorchVisionWrapper'),
-                        dict(
-                            distortion_scale=0.5,
-                            op='RandomPerspective',
-                            p=1,
-                            type='TorchVisionWrapper'),
+                        dict(max_angle=1, type='RandomRotate'),
+                        # dict(
+                        #     degrees=15,
+                        #     op='RandomAffine',
+                        #     scale=(
+                        #         0.5,
+                        #         2.0,
+                        #     ),
+                        #     shear=(
+                        #         -45,
+                        #         45,
+                        #     ),
+                        #     translate=(
+                        #         0.3,
+                        #         0.3,
+                        #     ),
+                        #     type='TorchVisionWrapper'),
+                        # dict(
+                        #     distortion_scale=0.5,
+                        #     op='RandomPerspective',
+                        #     p=1,
+                        #     type='TorchVisionWrapper'),
                     ],
                     type='RandomChoice'),
             ],
@@ -410,28 +410,28 @@ train_pipeline = [
         transforms=[
             dict(
                 transforms=[
-                    dict(max_angle=15, type='RandomRotate'),
-                    dict(
-                        degrees=15,
-                        op='RandomAffine',
-                        scale=(
-                            0.5,
-                            2.0,
-                        ),
-                        shear=(
-                            -45,
-                            45,
-                        ),
-                        translate=(
-                            0.3,
-                            0.3,
-                        ),
-                        type='TorchVisionWrapper'),
-                    dict(
-                        distortion_scale=0.5,
-                        op='RandomPerspective',
-                        p=1,
-                        type='TorchVisionWrapper'),
+                    dict(max_angle=1, type='RandomRotate'),
+                    # dict(
+                    #     degrees=15,
+                    #     op='RandomAffine',
+                    #     scale=(
+                    #         0.5,
+                    #         2.0,
+                    #     ),
+                    #     shear=(
+                    #         -45,
+                    #         45,
+                    #     ),
+                    #     translate=(
+                    #         0.3,
+                    #         0.3,
+                    #     ),
+                    #     type='TorchVisionWrapper'),
+                    # dict(
+                    #     distortion_scale=0.5,
+                    #     op='RandomPerspective',
+                    #     p=1,
+                    #     type='TorchVisionWrapper'),
                 ],
                 type='RandomChoice'),
         ],
@@ -588,4 +588,4 @@ visualizer = dict(
     vis_backends=[
         dict(type='LocalVisBackend'),
     ])
-work_dir = './work_dirs/abinet-vision_20e_st-an_mj_naver'
+work_dir = './work_dirs/abinet-vision_20e_st-an_mj_naver_noaug'

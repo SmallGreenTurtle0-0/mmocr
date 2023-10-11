@@ -1,1 +1,1 @@
-CUDA_LAUNCH_BLOCKING=1 CUDA_VISIBLE_DEVICES=2 python3 tools/train.py configs/textrecog/abinet/abinet-vision_20e_st-an_mj_naver_custom.py
+CUDA_LAUNCH_BLOCKING=1 CUDA_VISIBLE_DEVICES=2 python3.8 tools/train.py configs/textrecog/abinet/abinet_origin.py
