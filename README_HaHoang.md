@@ -1,15 +1,21 @@
 # Installation
 ```bash
+mkvirtualenv -p python3.8 mmocr
+pip install torch==1.10.1+cu111 torchvision==0.11.2+cu111 torchaudio==0.10.1 -f https://download.pytorch.org/whl/cu111/torch_stable.html
+
+pip3 install openmim
+# git clone https://github.com/SmallGreenTurtle0-0/mmocr.git
+cd mmocr
+pip install -r requirements.txt
+# pip install --no-cache-dir -e .
+pip install -r requirements/albu.txt
+
+# if mmengine has bug
+python -m pip install pip~=19.0
 pip install -U openmim
 mim install mmengine
 mim install 'mmcv>=2.0.0rc1'
 pip install 'mmdet>=3.0.0rc0'
-
-# git clone https://github.com/SmallGreenTurtle0-0/mmocr.git
-cd mmocr
-pip install -r requirements.txt
-pip install --no-cache-dir -e .
-pip install -r requirements/albu.txt
 ```
 # Convert txt to json
 
