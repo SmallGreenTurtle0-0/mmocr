@@ -1,17 +1,17 @@
-naver_textrecog_data_root = '/mnt/disk1/mbbank/OCR/DATA/data_quangnd/new_train'
+naver_textrecog_data_root = '/home/vht/hahoang/HackthonOCR/DATA/data_quangnd/new_train'
 naver_textrecog_test = dict(
-    ann_file='/mnt/disk1/mbbank/OCR/DATA/team/val.json',
-    data_root='/mnt/disk1/mbbank/OCR/DATA/data_quangnd/new_train',
+    ann_file='/home/vht/hahoang/HackthonOCR/DATA/team/data_partition/val3.json',
+    data_root=naver_textrecog_data_root,
     pipeline=None,
     test_mode=True,
     type='OCRDataset')
 naver_textrecog_train = dict(
-    ann_file='/mnt/disk1/mbbank/OCR/DATA/team/train.json',
-    data_root='/mnt/disk1/mbbank/OCR/DATA/data_quangnd/new_train',
+    ann_file='/home/vht/hahoang/HackthonOCR/DATA/team/data_partition/train3.json',
+    data_root=naver_textrecog_data_root,
     pipeline=None,
     test_mode=False,
     type='OCRDataset')
-
+img_size = (128, 32)
 default_scope = 'mmocr'
 env_cfg = dict(
     cudnn_benchmark=True,
@@ -21,7 +21,7 @@ randomness = dict(seed=None)
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', save_best='auto'),
     # checkpoint=dict(interval=1, type='CheckpointHook'),
-    logger=dict(interval=100, type='LoggerHook'),
+    logger=dict(interval=1000, type='LoggerHook'),
     param_scheduler=dict(type='ParamSchedulerHook'),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     sync_buffer=dict(type='SyncBuffersHook'),
@@ -128,7 +128,7 @@ train_pipeline = [
         ignore_empty=True,
         min_size=2),
     dict(type='LoadOCRAnnotations', with_text=True),
-    dict(type='Resize', scale=(128, 32)),
+    dict(type='Resize', scale=img_size),
     dict(
         type='RandomApply',
         prob=0.5,
@@ -181,28 +181,17 @@ train_pipeline = [
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile', file_client_args=dict(backend='disk')),
-    dict(type='Resize', scale=(128, 32)),
+    dict(type='Resize', scale=img_size),
     dict(type='LoadOCRAnnotations', with_text=True),
     dict(
         type='PackTextRecogInputs',
         meta_keys=('img_path', 'ori_shape', 'img_shape', 'valid_ratio'))
 ]
 train_list = [
-    dict(
-        type='OCRDataset',
-        data_root='/mnt/disk1/mbbank/OCR/DATA/data_quangnd/new_train',
-        # data_prefix=dict(img_path='mnt/ramdisk/max/90kDICT32px'),
-        ann_file='/mnt/disk1/mbbank/OCR/DATA/team/train.json',
-        test_mode=False,
-        pipeline=None)
+    naver_textrecog_train 
 ]
 test_list = [
-    dict(
-        type='OCRDataset',
-        data_root='/mnt/disk1/mbbank/OCR/DATA/data_quangnd/new_train',
-        ann_file='/mnt/disk1/mbbank/OCR/DATA/team/val.json',
-        test_mode=True,
-        pipeline=None)
+    naver_textrecog_test
 ]
 train_dataset = dict(
     type='ConcatDataset',
@@ -234,4 +223,4 @@ val_dataloader = dict(
     dataset=test_dataset)
 
 launcher = 'slurm'
-work_dir = './work_dirs/abinet_case_unchanged'
+work_dir = './work_dirs/abinet_case_unchanged_fold3'

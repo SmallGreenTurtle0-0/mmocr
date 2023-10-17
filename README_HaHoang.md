@@ -7,7 +7,7 @@ pip3 install openmim
 # git clone https://github.com/SmallGreenTurtle0-0/mmocr.git
 cd mmocr
 pip install -r requirements.txt
-# pip install --no-cache-dir -e .
+pip install --no-cache-dir -e .
 pip install -r requirements/albu.txt
 
 # if mmengine has bug
@@ -24,14 +24,14 @@ Nên cần chuyển sang dạng của mmocr.
 Sau đâu là các chuyển. Đọc thêm ở [Dataset guide](https://github.com/SmallGreenTurtle0-0/mmocr/blob/b18a09b2f063911a2de70f477aa21da255ff505d/docs/en/migration/dataset.md?plain=1#L3)
 
 ```bash
-python tools/dataset_converters/textdet/data_migrator.py ${IN_PATH} ${OUT_PATH}
+python tools/dataset_converters/textrecog/data_migrator.py ${IN_PATH} ${OUT_PATH} --format ${txt, jsonl, lmdb}
 ```
 
-| ARGS     | Type                             | Description                                                                                                                                                      |
-| -------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| in_path  | str                              | （Required）Path to the old annotation file.                                                                                                                     |
-| out_path | str                              | （Required）Path to the new annotation file.                                                                                                                     |
-| --task   | 'auto', 'textdet', 'textspotter' | Specifies the compatible task for the output dataset annotation. If 'textdet' is specified, the text field in coco format will not be dumped. The default is 'auto', which automatically determines the output format based on the the old annotation files. |
+| ARGS     | Type                   | Description                                       |
+| -------- | ---------------------- | ------------------------------------------------- |
+| in_path  | str                    | （Required）Path to the old annotation file.      |
+| out_path | str                    | （Required）Path to the new annotation file.      |
+| --format | 'txt', 'jsonl', 'lmdb' | Specify the format of the old dataset annotation. |
 
 # Train
 Lưu ý sửa path đến data và annotation ở trong file config.
