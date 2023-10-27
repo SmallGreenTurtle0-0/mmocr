@@ -118,7 +118,8 @@ class BaseDecoder(BaseModule):
         self,
         feat: Optional[torch.Tensor] = None,
         out_enc: Optional[torch.Tensor] = None,
-        data_samples: Optional[Sequence[TextRecogDataSample]] = None
+        data_samples: Optional[Sequence[TextRecogDataSample]] = None,
+        return_probs: bool = True,
     ) -> Sequence[TextRecogDataSample]:
         """Perform forward propagation of the decoder and postprocessor.
 
@@ -136,7 +137,11 @@ class BaseDecoder(BaseModule):
             results. Results are stored in ``pred_text``.
         """
         out_dec = self(feat, out_enc, data_samples)
-        return self.postprocessor(out_dec, data_samples)
+        # author: @hahoang
+        if return_probs:
+            return self.postprocessor(out_dec, data_samples), out_dec
+        else:
+            return self.postprocessor(out_dec, data_samples)
 
     def forward(
         self,

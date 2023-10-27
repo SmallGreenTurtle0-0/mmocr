@@ -187,10 +187,17 @@ class BaseMMOCRInferencer(BaseInferencer):
         ori_inputs = self._inputs_to_list(inputs)
         inputs = self.preprocess(
             ori_inputs, batch_size=batch_size, **preprocess_kwargs)
-        results = {'predictions': [], 'visualization': []}
+        results = {'predictions': [], 'visualization': [], 'probs': []}
         for ori_inputs, data in track(
                 inputs, description='Inference', disable=not progress_bar):
-            preds = self.forward(data, **forward_kwargs)
+            # author: @hahoang
+            preds__ = self.forward(data, **forward_kwargs)
+            preds, probs = None, None
+            if isinstance(preds__, tuple):
+                preds, probs = preds__
+            else:
+                preds = preds__
+
             visualization = self.visualize(
                 ori_inputs, preds, img_out_dir=img_out_dir, **visualize_kwargs)
             batch_res = self.postprocess(
@@ -200,6 +207,9 @@ class BaseMMOCRInferencer(BaseInferencer):
                 pred_out_dir=pred_out_dir,
                 **postprocess_kwargs)
             results['predictions'].extend(batch_res['predictions'])
+            # author: @hahoang
+            if probs is not None:
+                results['probs'].extend(probs)
             if return_vis and batch_res['visualization'] is not None:
                 results['visualization'].extend(batch_res['visualization'])
         return results

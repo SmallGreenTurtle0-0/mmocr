@@ -113,6 +113,7 @@ class MMOCRInferencer(BaseMMOCRInferencer):
                 det_batch_size: Optional[int] = None,
                 rec_batch_size: Optional[int] = None,
                 kie_batch_size: Optional[int] = None,
+                return_probs: bool = False,
                 **forward_kwargs) -> PredType:
         """Forward the inputs to the model.
 
@@ -144,12 +145,16 @@ class MMOCRInferencer(BaseMMOCRInferencer):
         if self.mode == 'rec':
             # The extra list wrapper here is for the ease of postprocessing
             self.rec_inputs = inputs
-            predictions = self.textrec_inferencer(
+            # author: @hahoang
+            infer_result = self.textrec_inferencer(
                 self.rec_inputs,
                 return_datasamples=True,
                 batch_size=rec_batch_size,
-                **forward_kwargs)['predictions']
+                **forward_kwargs)
+            predictions = infer_result['predictions']
+            
             result['rec'] = [[p] for p in predictions]
+            result['probs'] = infer_result['probs']
         elif self.mode.startswith('det'):  # 'det'/'det_rec'/'det_rec_kie'
             result['det'] = self.textdet_inferencer(
                 inputs,
@@ -314,12 +319,14 @@ class MMOCRInferencer(BaseMMOCRInferencer):
                                self)._get_chunk_data(ori_inputs, batch_size)
         results = {'predictions': [], 'visualization': []}
         for ori_input in track(chunked_inputs, description='Inference'):
+            # author: @hahoang
             preds = self.forward(
                 ori_input,
                 det_batch_size=det_batch_size,
                 rec_batch_size=rec_batch_size,
                 kie_batch_size=kie_batch_size,
                 **forward_kwargs)
+
             visualization = self.visualize(
                 ori_input, preds, img_out_dir=img_out_dir, **visualize_kwargs)
             batch_res = self.postprocess(
@@ -363,18 +370,40 @@ class MMOCRInferencer(BaseMMOCRInferencer):
             Dict: Inference and visualization results, mapped from
                 "predictions" and "visualization".
         """
-
         result_dict = {}
         pred_results = [{} for _ in range(len(next(iter(preds.values()))))]
         if 'rec' in self.mode:
-            for i, rec_pred in enumerate(preds['rec']):
-                result = dict(rec_texts=[], rec_scores=[])
-                for rec_pred_instance in rec_pred:
-                    rec_dict_res = self.textrec_inferencer.pred2dict(
-                        rec_pred_instance)
-                    result['rec_texts'].append(rec_dict_res['text'])
-                    result['rec_scores'].append(rec_dict_res['scores'])
-                pred_results[i].update(result)
+            if len(preds['probs']) == 0:
+                i = 0
+                for rec_pred in preds['rec']:
+                    # author: @hahoang
+                    print(rec_pred.img_path)
+                    result = dict(rec_texts=[], rec_scores=[], rec_score_char=[], probs=[])
+                    for rec_pred_instance in rec_pred:
+                        rec_dict_res = self.textrec_inferencer.pred2dict(
+                            rec_pred_instance)
+                        result['rec_texts'].append(rec_dict_res['text'])
+                        result['rec_scores'].append(rec_dict_res['scores'])
+                        # author: @hahoang
+                        result['rec_score_char'].append(rec_dict_res['score'])
+                    pred_results[i].update(result)
+                    i += 1
+            else:
+                i=0
+                for rec_pred, probs in zip(preds['rec'], preds['probs']):
+                    # author: @hahoang
+                    result = dict(rec_texts=[], rec_scores=[], rec_score_char=[], probs=probs.numpy(), img_path=[])
+                    for rec_pred_instance in rec_pred:
+                        rec_dict_res = self.textrec_inferencer.pred2dict(
+                            rec_pred_instance)
+                        result['rec_texts'].append(rec_dict_res['text'])
+                        result['rec_scores'].append(rec_dict_res['scores'])
+                        # author: @hahoang
+                        result['rec_score_char'].append(rec_dict_res['score'])
+                        result['img_path'].append(rec_pred_instance.img_path)
+                    pred_results[i].update(result)
+                    i += 1
+
         if 'det' in self.mode:
             for i, det_pred in enumerate(preds['det']):
                 det_dict_res = self.textdet_inferencer.pred2dict(det_pred)
