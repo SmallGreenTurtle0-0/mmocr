@@ -392,7 +392,7 @@ class MMOCRInferencer(BaseMMOCRInferencer):
                 i=0
                 for rec_pred, probs in zip(preds['rec'], preds['probs']):
                     # author: @hahoang
-                    result = dict(rec_texts=[], rec_scores=[], rec_score_char=[], probs=probs.numpy(), img_path=[])
+                    result = dict(rec_texts=[], rec_scores=[], rec_score_char=[], probs=probs.cpu().numpy(), img_path=[])
                     for rec_pred_instance in rec_pred:
                         rec_dict_res = self.textrec_inferencer.pred2dict(
                             rec_pred_instance)

@@ -96,7 +96,7 @@ def parse_args():
         init_args[init_kw] = call_args.pop(init_kw)
     args = []
     for rec_weight in init_args['rec_weights']:
-        init_args__ = init_args
+        init_args__ = init_args.copy()
         init_args__['rec_weights'] = rec_weight
         args.append((init_args__, call_args))
     return args
@@ -111,7 +111,7 @@ def main():
     i = 0
     for init_args, call_args in args:
         i += 1
-        model_name = 'id_' + str(i) + '_' +  osp.basename(init_args['rec_weights'])[:-4]
+        model_name = init_args['rec_weights'].split('/')[-2] + '_' +  osp.basename(init_args['rec_weights'])[:-4]
         call_args['out_dir'] = out_dir+'/'+model_name
         ocr = MMOCRInferencer(**init_args)
         result = ocr(**call_args)
@@ -141,26 +141,35 @@ def main():
         for j in range(m):
             item = results[j][i]
             text = item['rec_texts'][0]
-            ocr = min(item['rec_score_char'][0])
-            score = (ocr**4) * frequency[text]
-            total_score += score
-            probs = item['probs']
-            ensemble_probs += probs*score
-        ensemble_probs /= total_score
+            if len(text) != 0:
+                ocr = min(item['rec_score_char'][0])
+                score = (ocr**4) * frequency[text]
+                total_score += score
+                probs = item['probs']
+                ensemble_probs += probs*score
+            else:
+                print(out_dir)
+        
 
         #decode
-        index = np.argmax(ensemble_probs, axis=-1)
-        value = np.max(ensemble_probs, axis=-1)
-        p = 1.00
-        text_ensemble = ''
-        for idx, v in zip(index, value):
-            c = dict_vn.dict[idx]
-            if 'EOS' in c:
-                break
-            text_ensemble += c
-            p = min(p, v)
         img_name = osp.basename(img_path)
-        results_ensemble.append(f'{img_name} {text_ensemble} {p}')
+        if total_score == 0:
+            text_ensemble = 'n'
+            results_ensemble.append(f'{img_name} {text_ensemble} {0.0}')
+        else:
+            ensemble_probs /= total_score
+            index = np.argmax(ensemble_probs, axis=-1)
+            value = np.max(ensemble_probs, axis=-1)
+            p = 1.00
+            text_ensemble = ''
+            for idx, v in zip(index, value):
+                c = dict_vn.dict[idx]
+                if 'EOS' in c:
+                    break
+                text_ensemble += c
+                p = min(p, v)
+            
+            results_ensemble.append(f'{img_name} {text_ensemble} {p}')
 
     # save result
     os.makedirs(out_dir, exist_ok=True)

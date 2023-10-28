@@ -1,4 +1,4 @@
-INPUT=/home/vht/hahoang/HackthonOCR/DATA/data_quangnd/sample
+INPUT=/home/vht/hahoang/HackthonOCR/DATA/data_quangnd/test
 WEIGHT=/home/vht/hahoang/HackthonOCR/CODE/mmocr/work_dirs/abinet_case_unchanged/best_NAVER_recog_word_acc_epoch_28.pth
 WEIGHT1=/home/vht/hahoang/HackthonOCR/CODE/mmocr/work_dirs/abinet_case_unchanged_fold1/best_NAVER_recog_word_acc_epoch_34.pth
 WEIGHT2=/home/vht/hahoang/HackthonOCR/CODE/mmocr/work_dirs/abinet_case_unchanged_fold2/best_NAVER_recog_word_acc_epoch_32.pth
@@ -9,7 +9,7 @@ WEIGHT5=/home/vht/hahoang/HackthonOCR/CODE/mmocr/work_dirs/abinet_case_unchanged
 CUDA_VISIBLE_DEVICES=0 python tools/infer_ensemble.py $INPUT \
  --rec ABINet \
  --rec-weight $WEIGHT $WEIGHT1 $WEIGHT2 $WEIGHT3 $WEIGHT4 $WEIGHT5\
- --out-dir /home/vht/hahoang/HackthonOCR/DATA/infer_private_end \
+ --out-dir /home/vht/hahoang/HackthonOCR/DATA/infer/infer_public012345 \
  --save_pred \
  --batch-size 128
 
